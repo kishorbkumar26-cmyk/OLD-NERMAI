@@ -1,0 +1,51 @@
+# ============================================================
+# NERMAI ACADEMY — Root .gitignore
+# ============================================================
+
+# ----- Secrets & Credentials (NEVER COMMIT) ----------------
+*.json.secret
+*firebase-adminsdk*.json
+*service-account*.json
+.env
+.env.*
+!.env.example
+
+# ----- Node Modules ----------------------------------------
+node_modules/
+**/node_modules/
+
+# ----- Build Outputs ----------------------------------------
+dist/
+build/
+.expo/
+*.tsbuildinfo
+
+# ----- Logs ------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ----- OS & Editor -----------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ----- Temporary / Scratch Files ---------------------------
+tsc-errors.txt
+*.tmp
+refactor_web.js
+test-regex.js
+
+# ----- React Native / Expo ---------------------------------
+.expo-shared/
+android/
+ios/
+
+# ----- Coverage -------------------------------------------
+coverage/

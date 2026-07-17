@@ -1,0 +1,326 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        request.auth.token.role in ['super_admin', 'admin', 'staff'];
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.role == 'super_admin';
+    }
+
+    function isStudent() {
+      return isSignedIn() && request.auth.token.role == 'student';
+    }
+
+    function isSelf(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // NOTE: Backend Admin SDK bypasses ALL rules below.
+    // These rules guard DIRECT client-side Firestore access only.
+
+    // ── Core Module ────────────────────────────────────────────────────────
+    match /tenants/{tenantId} {
+      allow read: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow write: if isSelf(userId) || isAdmin();
+    }
+
+    match /students/{studentId} {
+      allow read: if isSelf(studentId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /staff/{staffId} {
+      allow read: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    match /staff_roles/{staffRoleId} {
+      allow read: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // ── Academic Module ───────────────────────────────────────────────────
+    match /batches/{batchId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /batch_memberships/{membershipId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /courses/{courseId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /enrollments/{enrollmentId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /subjects/{subjectId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /topics/{topicId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /classes/{classId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Content Module ────────────────────────────────────────────────────
+    match /videos/{videoId} {
+      // Videos are served via signed URLs — no direct client reads needed
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /resources/{resourceId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /live_sessions/{sessionId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /watch_history/{watchId} {
+      allow read: if isAdmin();
+      allow write: if false; // Written by backend only
+    }
+
+    // ── Test Module ───────────────────────────────────────────────────────
+    match /tests/{testId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /questions/{questionId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /attempts/{attemptId} {
+      allow read: if isAdmin() || isSelf(resource.data.studentId);
+      allow write: if false; // Written by backend only
+    }
+
+    match /attempt_answers/{answerId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /question_translations/{translationId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /test_targets/{targetId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /daily_quizzes/{dailyQuizId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Finance Module ────────────────────────────────────────────────────
+    // Finance is ADMIN-ONLY — no student direct access
+    match /fees/{feeId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /ledger/{ledgerId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /fee_reminders/{reminderId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /expense_categories/{categoryId} {
+      allow read: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /income_sources/{sourceId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /wallets/{walletId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /refunds/{refundId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    // ── CRM Module ────────────────────────────────────────────────────────
+    match /crm_leads/{leadId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /admissions/{admissionId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /chatbot_logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /referrals/{referralId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /coupons/{couponId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /crm_followups/{followupId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /alumni_feedback/{feedbackId} {
+      allow read: if isAdmin();
+      allow write: if isSignedIn();
+    }
+
+    match /campaigns/{campaignId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── Communication Module ──────────────────────────────────────────────
+    match /announcements/{announcementId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isAdmin() || isSelf(resource.data.userId);
+      allow write: if false; // Backend only
+    }
+
+    match /user_devices/{deviceId} {
+      allow read: if isAdmin() || isSelf(resource.data.userId);
+      allow write: if isSelf(resource.data.userId) || isAdmin();
+    }
+
+    match /conversations/{conversationId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /support_tickets/{ticketId} {
+      allow read: if isAdmin() || isSelf(resource.data.studentId);
+      allow write: if isSignedIn();
+    }
+
+    // ── System Module ─────────────────────────────────────────────────────
+    match /audit_logs/{logId} {
+      allow read: if isSuperAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /analytics/{analyticId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    match /certificates/{certificateId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Backend only
+    }
+
+    match /access_rules/{ruleId} {
+      allow read: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    match /documents/{documentId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Assistant / Knowledge Base ────────────────────────────────────────
+    match /kb_intents/{intentId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /kb_faqs/{faqId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /assistant_settings/{tenantId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /assistant_quick_actions/{actionId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /unanswered_queries/{queryId} {
+      allow read: if isAdmin();
+      allow write: if false; // Backend only
+    }
+  }
+}

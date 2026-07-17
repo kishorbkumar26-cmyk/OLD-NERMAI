@@ -1,0 +1,60 @@
+name: UNISTRIX Backend CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+        
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './backend/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type Check
+        run: npm run type-check
+
+      - name: Setup Firebase Emulator
+        run: npm i -g firebase-tools
+
+      - name: Run Integration Tests
+        run: |
+          firebase emulators:exec "npm run test:integration" \
+            --project demo-test \
+            --only auth,firestore
+        env:
+          NODE_ENV: test
+          FIREBASE_PROJECT_ID: demo-test
+          FIREBASE_CLIENT_EMAIL: test@example.com
+          FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\\nMOCK\\n-----END PRIVATE KEY-----"
+          JWT_SECRET: test-jwt-secret
+          AES_SECRET_KEY: test-aes-secret
+          REDIS_URL: redis://localhost:6379
+          REDIS_REQUIRED: "false"
