@@ -1,0 +1,53 @@
+{
+    "name": "web",
+    "version": "1.0.0",
+    "main": "index.ts",
+    "dependencies": {
+        "@expo/metro-runtime": "~6.1.2",
+        "@nermai/api": "*",
+        "@nermai/constants": "*",
+        "@nermai/live-core": "^1.0.0",
+        "@nermai/shared": "*",
+        "@nermai/theme": "*",
+        "@nermai/types": "*",
+        "@nermai/utils": "*",
+        "@nermai/validation": "*",
+        "@tanstack/react-query": "^5.101.2",
+        "@tanstack/react-query-persist-client": "^5.101.2",
+        "@zoom/meetingsdk": "^6.2.0",
+        "autoprefixer": "^10.5.2",
+        "axios": "^1.18.1",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "expo": "~54.0.35",
+        "expo-status-bar": "~3.0.9",
+        "firebase": "^12.16.0",
+        "framer-motion": "^12.42.2",
+        "idb-keyval": "^6.3.0",
+        "lucide-react": "^1.23.0",
+        "postcss": "^8.5.16",
+        "react": "19.1.0",
+        "react-dom": "19.1.0",
+        "react-hook-form": "^7.80.0",
+        "react-markdown": "^10.1.0",
+        "react-native": "^0.81.5",
+        "react-native-web": "^0.21.2",
+        "react-pdf": "^10.4.1",
+        "react-router-dom": "^6.28.0",
+        "tailwind-merge": "^3.6.0",
+        "tailwindcss": "^3.4.1",
+        "zod": "^4.4.3",
+        "zustand": "^5.0.14"
+    },
+    "devDependencies": {
+        "@types/react": "~19.1.10",
+        "typescript": "~5.9.2"
+    },
+    "scripts": {
+        "start": "expo start",
+        "android": "expo start --android",
+        "ios": "expo start --ios",
+        "web": "expo start --web"
+    },
+    "private": true
+}
